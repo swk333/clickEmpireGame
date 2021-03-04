@@ -4,25 +4,27 @@ import React from 'react'
 import Box from '@material-ui/core/Box';
 import List from '@material-ui/core/List';
 import ListItemText from '@material-ui/core/ListItemText';
+import { Link } from "react-router-dom";
 
-import { Link } from 'react-router-dom';
+const GoodsList = (props: any, { match }:any) => {
 
-
-
-
-const GoodsList = (props: any) => {
-  const listItems = props.goods.map((goods: any, index: number) =>
-    <List key={index}>
-      <Link to="/Goods">          
+  const listItems = props.assetArray.map((goods: any, index: number) =>
+  <ul key={index}>
+    <List>
+      <Link to = {{pathname: `/Goods/${index}`, state:index}}>          
       <ListItemText>{goods.name}</ListItemText>
       </Link>
-      <ListItemText>Price: ${goods.price}</ListItemText>
+      <ListItemText>価格: ${goods.price}</ListItemText>
+      <ListItemText>保有数量: {props.user[goods.id]}個</ListItemText>
     </List>
+
+  </ul>
   );
+
 
   return (
     <Box bgcolor="text.secondary" m={1} p={1} width="50%">
-        <ul>{listItems}</ul>
+        {listItems}
     </Box>
   )
 }
