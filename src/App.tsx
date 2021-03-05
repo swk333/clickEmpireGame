@@ -12,7 +12,7 @@ class User {
     public days:number, 
     public money:number, 
     public hamburger:number, 
-    public etfStock:number, 
+    public etfStocks:number, 
     public etfBonds:number, 
     public lemonadeStand:number, 
     public iceCreamTruck:number, 
@@ -36,23 +36,21 @@ const App = () => {
   const createUser = (e: any) => {
     setUserName(e.currentTarget.value);
     const newUser = Object.assign(user, {name: userName});
+    setUserStatus(newUser);
   //ユーザー情報の保存
-    const jsonUserData= JSON.stringify(newUser);
-    console.log(jsonUserData);
-    localStorage.setItem(newUser.name, jsonUserData);
+    const jsonUserData= JSON.stringify(user);
+    localStorage.setItem(user.name, jsonUserData);
   }
 
   //ユーザーをロード
   const loadUser = (e: any) => {
     setUserName(e.currentTarget.value);
     const loadJsonString: any = localStorage.getItem(userName);
-    console.log(loadJsonString);
-    const joinedUser:any = JSON.parse(loadJsonString);
+    const loadUser:any = JSON.parse(loadJsonString);
+    setUserStatus(loadUser);
   }
 
-  const startUser = () => {
-    
-  }
+
   
   return (
     <div className="App">

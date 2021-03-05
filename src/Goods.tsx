@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import Button from '@material-ui/core/Button';
 import List from '@material-ui/core/List';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -20,7 +20,10 @@ const Goods = (props: any) => {
   const location:any = useLocation();
   const index = location.state;
   const goods = props.assetArray[index];
-  props.setAssetIndex(index);
+  useEffect(() => {
+    props.setAssetIndex(index)
+  });
+  
   return (
     <Box bgcolor="text.secondary" m={1} p={1} width={1/2}>
       <h3>{goods.name}</h3>
@@ -54,7 +57,7 @@ const Goods = (props: any) => {
           onClick={(e:any ) => props.onPurchase(e)}>
             Purchase
           </Button>
-        <Link to="">
+        <Link to="/Top">
         <Button variant="contained">Go back</Button>
         </Link>
     </Box>

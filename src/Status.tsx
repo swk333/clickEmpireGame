@@ -13,10 +13,10 @@ const Status = (props: any) => {
   return (
     <Box bgcolor="text.secondary" m={1} p={1} width={1/2}>
       <List>
-        <ListItemText>Name: {user.name}</ListItemText>
-        <ListItemText>Age: {user.age} years old</ListItemText>
-        <ListItemText>Days: {user.days} days</ListItemText>
-        <ListItemText>Money: ${user.money}</ListItemText>
+        <ListItemText>名前: {user.name}</ListItemText>
+        <ListItemText>年齢: {user.age} 歳</ListItemText>
+        <ListItemText>経過日数: {user.days} 日</ListItemText>
+        <ListItemText>保有現金: {user.money} 円</ListItemText>
 
       </List>
     </Box>

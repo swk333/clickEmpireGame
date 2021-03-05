@@ -14,7 +14,7 @@ const GoodsList = (props: any, { match }:any) => {
       <Link to = {{pathname: `/Goods/${index}`, state:index}}>          
       <ListItemText>{goods.name}</ListItemText>
       </Link>
-      <ListItemText>価格: ${goods.price}</ListItemText>
+      <ListItemText>価格: {goods.price.toLocaleString()}円</ListItemText>
       <ListItemText>保有数量: {props.user[goods.id]}個</ListItemText>
     </List>
 

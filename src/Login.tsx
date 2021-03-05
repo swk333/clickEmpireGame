@@ -10,7 +10,6 @@ const Login = (props: any) => {
       <h3>新規スタート</h3>
       <TextField 
         id="newName"
-        // value={props.userName}
         label="名前"
         variant="outlined"
         onChange={(e:any) => props.setUserName(e.currentTarget.value)}
@@ -24,7 +23,6 @@ const Login = (props: any) => {
       <h3>ログイン</h3>
       <TextField 
         id="loginName"
-        // value={props.userName}
         label="名前"
         variant="outlined"
         onChange={(e:any) => props.setUserName(e.currentTarget.value)}
