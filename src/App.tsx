@@ -1,8 +1,34 @@
 import React, {useState} from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 import Top from './Top';
 import Login from './Login';
-import './App.css';
+// import './App.css';
+import { makeStyles } from '@material-ui/core/styles';
+import { createMuiTheme } from "@material-ui/core/styles";
+import { ThemeProvider } from '@material-ui/core/styles';
+
+const useStyles = makeStyles({
+  root: {
+    backgroundColor: "#004643",
+    color: 'white',
+    padding: '0 30px',
+    position: "relative",
+    minHeight: '100vh',
+    height: '100%',
+    textDecoration: "none",
+  },
+});
+
+const theme = createMuiTheme({
+  typography: {
+    fontFamily: [
+      'Reggae One',
+      'Noto Sans JP',
+      'Roboto',
+      'sans-serif',
+    ].join(','),
+  },
+});
 
 //ユーザー定義
 class User {
@@ -26,51 +52,37 @@ class User {
     {}  
 }
 
-
 const App = () => {
-
+  const classes = useStyles();
   const [user, setUserStatus] = useState(new User("", 20, 0, 50000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
-  const [userName, setUserName] = useState("");
+  const [login, setLogin] = useState(false);
 
-  //新規ユーザー登録
-  const createUser = (e: any) => {
-    setUserName(e.currentTarget.value);
-    const newUser = Object.assign(user, {name: userName});
-    setUserStatus(newUser);
-  //ユーザー情報の保存
-    const jsonUserData= JSON.stringify(user);
-    localStorage.setItem(user.name, jsonUserData);
-  }
-
-  //ユーザーをロード
-  const loadUser = (e: any) => {
-    setUserName(e.currentTarget.value);
-    const loadJsonString: any = localStorage.getItem(userName);
-    const loadUser:any = JSON.parse(loadJsonString);
-    setUserStatus(loadUser);
-  }
-
-
-  
+  const loginCheck = () => {
   return (
-    <div className="App">
+    login 
+    ? (<Top user={user} setUserStatus={setUserStatus} setLogin={setLogin} login={login}/>)
+    : (<Login login={login} setLogin={setLogin} user={user} setUserStatus={setUserStatus} />)
+    );
+  };
+
+
+
+  return (
+    <ThemeProvider theme={theme}>
+    <div className={classes.root}>
+    
       <Router>
         <Switch>
-          <Route exact path="/">
-            <Login 
-            // user={user} 
-            // setUserStatus={setUserStatus}
-            userName={userName} 
-            setUserName={setUserName}
-            createUser={(e:any) => createUser(e)}
-            loadUser={(e:any) => loadUser(e)} />
+          <Route exact path = "/">
+            <Login login={login} setLogin={setLogin} user={user} setUserStatus={setUserStatus} />
           </Route>
-          <Route exact path="/Top">
-            <Top user={user} setUserStatus={setUserStatus} />
+          <Route path = "/Top">
+            {loginCheck()}
           </Route>
         </Switch>
       </Router>
     </div>
+    </ThemeProvider>
   );
 }
 

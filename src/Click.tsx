@@ -1,15 +1,14 @@
 import React from 'react'
-//import Typography from '@material-ui/core/Typography';
-//import Container from '@material-ui/core/Container';
+
 import Box from '@material-ui/core/Box';
-import hamburger from './food_hamburger.png';
 
 
 const Click = (props:any) => {
+  const hamburger = 'https://f.easyuploader.app/eu-prd/upload/20210307163305_4b744851.png';
 
   return (
-    <Box bgcolor="text.secondary" m={1} p={1} width="50%">
-      <img alt="hamburger" onClick={props.onClick} src={hamburger} />
+    <Box m={1} p={1}>
+      <img alt="hamburger" onClick={props.onClick} src={hamburger} width="200" height="150"/>
     </Box>
   )
 }

@@ -11,12 +11,12 @@ const Status = (props: any) => {
   const user = props.user;
 
   return (
-    <Box bgcolor="text.secondary" m={1} p={1} width={1/2}>
+    <Box m={1} p={1} width={1}>
       <List>
         <ListItemText>名前: {user.name}</ListItemText>
         <ListItemText>年齢: {user.age} 歳</ListItemText>
         <ListItemText>経過日数: {user.days} 日</ListItemText>
-        <ListItemText>保有現金: {user.money} 円</ListItemText>
+        <ListItemText>保有現金: {user.money.toLocaleString()} 円</ListItemText>
 
       </List>
     </Box>

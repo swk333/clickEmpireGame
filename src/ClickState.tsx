@@ -1,16 +1,17 @@
 import React from 'react'
 import Typography from '@material-ui/core/Typography';
-//import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
 
 
 
-const ClickState = () => {
-
+const ClickState = (props: any) => {
+  const user = props.user;
+  const clickCount = props.clickCount;
+  let moneyperclick = (user.hamburger === 0 ? 25 : user.hamburger * 25 + 25);
   return (
-    <Box bgcolor="info.main" m={1} p={1} width="50%">
-        <Typography variant="body1">1102 Burgers</Typography>
-        <Typography variant="body1">$25 per second</Typography>
+    <Box m={1} p={1}>
+        <Typography variant="body1">クリック回数：{clickCount}回</Typography>
+        <Typography variant="body1">１クリックあたり：{moneyperclick}円</Typography>
     </Box>
   )
 }

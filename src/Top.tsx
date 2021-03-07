@@ -2,15 +2,50 @@ import React, {useState, useEffect, useRef} from 'react';
 import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
-import Container from '@material-ui/core/Container';
 import Button from '@material-ui/core/Button';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+import { makeStyles } from '@material-ui/core/styles';
+import Divider from '@material-ui/core/Divider';
+import Paper from '@material-ui/core/Paper';
 
 import Goods from './Goods';
 import GoodsList from './GoodsList';
 import Status from './Status';
 import Click from './Click';
 import ClickState from './ClickState';
+import Detail from './Detail';
+import ButtonTop from './ButtonTop';
 
+
+const useStyles = makeStyles({
+  root: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: 'center',
+    flexDirection: "column",
+  },
+
+  box: {
+    backgroundColor: "#e8e4e6",
+    color: '#001e1d',
+    padding: '30px 30px',
+    position: "relative",
+    minHeight: '30vh',
+    height: '80%',
+    minWidth: "80vh",
+    marginTop: "10vh",
+    display: "flex",
+    alignItems: 'center',
+    justifyContent: 'space-around',
+  },
+
+  btn: {
+    backgroundColor: "#f9bc60",
+    margin: "10px",
+    color: "#001e1d",
+  },
+
+});
 
 //資産定義
 class Investment {
@@ -53,10 +88,11 @@ function useInterval(callback:any, delay:any) {
 
 
 const Top = (props: any) => {
-  
+  const classes = useStyles();
+
   //資産の定義
   const [assetArray, setAssetArray] = useState([
-    new Investment("hamburger", "ハンバーガー用マシン", 500, "グリルをクリックごとに 25 円を取得します。", 15000, 0),
+    new Investment("hamburger", "ハンバーガー用マシン", 500, "クリックするごとに 25 円を取得します。", 15000, 0),
     new Investment("etfStocks", "株式ETF", Infinity, "ETF 銘柄の購入分をまとめて加算し、毎秒 0.1% を取得します。", 300000, 0),
     new Investment("etfBonds", "債券ETF", Infinity, "ETF 銘柄の購入分をまとめて加算し、毎秒 0.07% を取得します。", 300000, 0),
     new Investment("lemonadeStand", "レモネードスタンド", 1000, "毎秒 30 円を取得します。	", 30000,30),
@@ -86,22 +122,29 @@ const Top = (props: any) => {
     }
   }, 1000);
   
+  //株式ETFの価格変更
+  useEffect(() => {
+    const stock = assetArray[1];
+    let stockPrice = (1 + user.etfStocks * 0.1) * stock.price;
+    let newStock = {...stock, price: stockPrice}
+    let newAssetArray = assetArray.slice();
+    newAssetArray.splice(1, 1, newStock);
+    setAssetArray(newAssetArray);
+    //assetArrayが第２引数に入ってないため警告=>入れるとPriceが更新されてしまうのでNG
+  }, [user.etfStocks])
 
 
-  //ユーザー情報の保存関数
-  const saveUserData = () => {
-    const jsonString = user;
-    const jsonDecoded = JSON.stringify(jsonString);
-    localStorage.setItem(user.name, jsonDecoded);
-  };
+
 
   // ハンバーガークリック処理関数
-  //todo:マシン数に応じてクリック金額像化
+  const [clickCount, setClickCount] = useState(0);
   const handleClick = () => {
-    setUserStatus({...user, money: user.money + 25});
+    let moneyperclick = (user.hamburger === 0 ? 25 : user.hamburger * 25 + 25);
+    let updateUser = Object.assign(user, {money: user.money + moneyperclick});
+    setUserStatus(updateUser);
+    setClickCount(prev => prev + 1);
   }
   
-
   //購入資産の入力処理
   const isNumber = (number: any) => {
     return(Number.isNaN(number) ? 0 : number);
@@ -115,22 +158,17 @@ const Top = (props: any) => {
   const submit = (e: React.MouseEvent<HTMLButtonElement>) => {
     const inputAsset = e.currentTarget.name;
     const inputValue = isNumber(input) * assetArray[assetIndex].price;
-    setUserStatus({...user, money: user.money - inputValue, [inputAsset]: user[inputAsset] + input});
-    setInput(0);
+    if(user.money < inputValue){
+      alert("現金が足りません")
+    } else if(user[inputAsset] + input > assetArray[assetIndex].maxPurchase) {
+      alert("最大数量を超えています")
+    } else {
+      setUserStatus({...user, money: user.money - inputValue, [inputAsset]: user[inputAsset] + input});
+    }
+    setInput(0);  
     e.preventDefault();
   };
   
-
-  useEffect(() => {
-    const stock = assetArray[1];
-    let stockPrice = (1 + user.etfStocks * 0.1) * stock.price;
-    let newStock = {...stock, price: stockPrice}
-    let newAssetArray = assetArray.slice();
-    newAssetArray.splice(1, 1, newStock);
-    setAssetArray(newAssetArray);
-    //assetArrayが第２引数に入ってないため警告=>入れるとPriceが更新されてしまうのでNG
-    //よくわからないタイミングで増えてる？=>コンパイルするときに増えてる
-  }, [user.etfStocks])
 
 
   //不動産に応じた資産計算関数
@@ -138,58 +176,72 @@ const Top = (props: any) => {
     let assetEarnedPerSec = 0;
     for(let i = 0; i < assetArray.length; i++){
       let asset = assetArray[i];
-      assetEarnedPerSec += user[asset.id] * asset.increasepersec;
+      assetEarnedPerSec += Math.floor(user[asset.id] * asset.increasepersec);
     }
-    // setUserStatus({...user, money: user.money + assetEarnedPerSec});
     let updateUser = Object.assign(user, {money: user.money + assetEarnedPerSec});
-    user = updateUser;
+    setUserStatus(updateUser);
   }
 
   //金融資産に応じた資産計算関数
   const calculateFinancialAssetIncrease = () => {
     const stocks = assetArray[1];
     const bonds = assetArray[2];
-    let assetEarnedPerSec = user[stocks.id] * stocks.price * 0.001 + user[bonds.id] * bonds.price * 0.0007;
-    // setUserStatus({...user, money: user.money + assetEarnedPerSec});
+    let assetEarnedPerSec = Math.floor(user[stocks.id] * stocks.price * 0.001 + user[bonds.id] * bonds.price * 0.0007);
     let updateUser = Object.assign(user, {money: user.money + assetEarnedPerSec});
-    user = updateUser;
+    setUserStatus(updateUser);
+    
   }
 
 
+
+
   return (
-    <Container>
-      <Box bgcolor="text.secondary" width="100%">
-      <Grid container direction="row" alignItems="center">
-        <Grid item xs>
-          <ClickState />
-          <Click onClick={() => handleClick()} />
-        </Grid>
-        <Grid item xs>
-          <Status user={user}/>
-          <Router>
-            <Switch>
+    <>
+    <Box className={classes.root}>
+      <Box className={classes.box}>
+        <Router>
+          <Switch>
             <Route exact path="/Top">
-              <GoodsList  user={user}　assetArray={assetArray} />
+              <Box>
+                <ClickState 
+                  user={user}
+                  clickCount={clickCount}/>
+                <Click 
+                  user={user}
+                  clickCount={clickCount}
+                  onClick={() => handleClick()}
+                  assetArray={assetArray}
+                  setAssetIndex={setAssetIndex}
+                  assetIndex={assetIndex} />
+              </Box>
+              <Box>
+                <Status user={user}/>
+                <GoodsList  user={user}　assetArray={assetArray} />
+              </Box>
             </Route>
+
             <Route path="/Goods/:pageId" component = { Goods }>
-              <Goods 
-                onChange={(e:any) => handleInputNum(e)} 
-                onPurchase={(e:any) => submit(e)} 
-                input={input} 
-                assetArray={assetArray}
-                setAssetIndex={setAssetIndex}
-                 />
-              </Route>
-            </Switch>
-          </Router>
-        </Grid>
-      </Grid>
-      <Button  variant="contained" onClick={() => saveUserData()}>保存</Button>
-      <Link to="">
-      <Button  variant="contained">戻る</Button>
-      </Link>
-      </Box>
-    </Container>
+              <Box>
+                <Detail
+                  assetArray={assetArray}
+                  setAssetIndex={setAssetIndex} />
+              </Box>
+              <Box>
+                <Status user={user}/>
+                <Goods 
+                  onChange={(e:any) => handleInputNum(e)} 
+                  onPurchase={(e:any) => submit(e)} 
+                  input={input} 
+                  assetArray={assetArray}
+                  setAssetIndex={setAssetIndex} />
+              </Box>
+            </Route>
+          </Switch>
+        </Router>
+        </Box> 
+      <ButtonTop user={user} setLogin={props.setLogin}/>
+    </Box>
+    </>
   );
 }
 
